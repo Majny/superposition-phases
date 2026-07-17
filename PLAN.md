@@ -99,3 +99,12 @@ AI writes the code; **I run every experiment and interpret every figure myself**
 interview will probe this project live. Each file has a "what am I looking at" note. First action:
 read `src/toy_cis.py`, run it, and eyeball whether the model beats the dedicated baseline — before
 we sweep anything.
+
+## References (verified 2026-07-18)
+
+- **Toy Models of Superposition** — Elhage et al. 2022, [2209.10652](https://arxiv.org/abs/2209.10652). The phase-change framing.
+- **Attribution-based Parameter Decomposition** — Braun et al. (Apollo) 2025, [2501.14926](https://arxiv.org/abs/2501.14926). Source of the 100-ReLU / 50-neuron *compressed-computation* testbed we reproduce.
+- **Compressed Computation is (probably) not Computation in Superposition** — 2025, [2606.14673](https://arxiv.org/abs/2606.14673). Skeptic side of the debate.
+- **Compressed Computation under L⁴ Loss is likely CiS** — da Silva & Heimersheim 2026, [2607.04800](https://arxiv.org/abs/2607.04800). The L⁴-codeword rebuttal → why the harness exposes L2 vs L4.
+- **On the Complexity of Neural Computation in Superposition** — Adler & Shavit 2024, [2409.15318](https://arxiv.org/abs/2409.15318). The capacity bound (~O(m²/log m)) we benchmark learned codes against. *(The bound is here, not in Hänni.)*
+- **Mathematical Models of Computation in Superposition** — Hänni, Mendel, Vaintrob, Chan 2024, [2408.05451](https://arxiv.org/abs/2408.05451). Constructions where superposition helps computation.
