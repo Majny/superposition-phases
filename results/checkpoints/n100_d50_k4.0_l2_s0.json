@@ -1,0 +1,17 @@
+{
+  "n": 100,
+  "d": 50,
+  "k": 4.0,
+  "loss": "l2",
+  "steps": 4000,
+  "batch": 2048,
+  "lr": 0.001,
+  "seed": 0,
+  "verbose": false,
+  "exponent": 2,
+  "trained_loss": 0.003326297039166093,
+  "dedicated_baseline_loss": 0.0033429802861064672,
+  "beats_baseline": true,
+  "ratio": 0.9950094689431133,
+  "tag": "n100_d50_k4.0_l2_s0"
+}
