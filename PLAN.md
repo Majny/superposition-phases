@@ -1,110 +1,77 @@
-# The Phase Diagram of Computation in Superposition
+# How far below the capacity ceiling do learned superposed codes sit?
 
-*Working plan + primer. Jakub Dvořák · started 2026-07-17. Repo name is a placeholder — rename freely.*
+*Working plan. Jakub Dvořák · started 2026-07-17 · reshaped 2026-07-18 after a novelty check.*
 
-## The one-paragraph pitch
+## The one-paragraph pitch (reshaped)
 
-Neural networks routinely represent **more features than they have neurons** by packing them
-into overlapping directions — *superposition*. A sharper, less-understood claim is that networks
-also **compute in superposition**: a layer with `d` neurons can compute a nonlinear function of
-`n ≫ d` sparse inputs at once, not just store them. When does gradient descent actually *find*
-such a solution, versus collapsing to a boring "handle only `d` features" one? Nobody has mapped
-that boundary. **This project maps the phase diagram** — over input sparsity, the compression
-ratio `d/n`, the task, and the loss — of when SGD discovers genuine computation-in-superposition,
-and measures how far the learned codes sit from the theoretical capacity bounds.
+Networks can *compute* in superposition — a layer of `m` neurons computing a nonlinear function of
+`n ≫ m` sparse inputs. Theory (Adler & Shavit) proves a hard ceiling of `~O(m²/log m)` features;
+constructions (Hänni et al.) hit `Õ(m^{2/3})`. **Nobody has ever plotted where SGD-*learned* codes
+actually sit relative to that ceiling.** The one paper positioned to do it explicitly declined
+("our model does not approach these theoretical limits… we focused on the mechanics"). That gap is
+the spine: **sweep model size and loss, measure the learned code's density, and plot its trajectory
+against the O(m²/log m) bound** — does crossing L2→L4 (or changing `d/n`) push learned codes toward
+or away from the ceiling? Second pillar: a single **3-class classifier** ({dedicated / dense-CC /
+superposed-code}) that, *validated by reproducing each prior paper's own verdict*, becomes the shared
+instrument the debate currently lacks — and run across the (sparsity × loss) plane the two camps
+never co-sampled, it localizes *where* the transition sits.
 
-## Why this, why me
+## Prior art & honest framing (the novelty check that reshaped this)
 
-- **It rewards math, not ML-engineering.** The hard, differentiating part is coding-theory /
-  compressed-sensing analysis (mutual coherence, pseudoinverse decoding, capacity bounds) — my
-  actual edge. The ML is a one-hidden-layer MLP.
-- **It runs on a laptop.** Toy MLPs train in seconds–minutes on a 64GB MacBook, CPU is fine.
-  No cluster, no queue, no fused-kernel plumbing. So it survives September exam prep, and
-  **every work session ends with a figure** (the point — I don't finish grand plans, I finish
-  figures).
-- **It's a live 2025-26 debate centered at Apollo Research** (compressed-computation model vs.
-  codeword solutions vs. capacity bounds) — precisely the MATS/PhD community I'm applying into,
-  so a solid result doubles as the application.
-- **Guaranteed fallback (de-risk):** even if the headline phase-diagram story is messy, a clean
-  open-source *replication + adjudication* of the current debate with ONE consistent solution
-  classifier applied uniformly to all the competing setups is itself a workshop paper — the
-  debate currently rests on incompatible diagnostics. This byproduct is reachable in weeks 1–2.
+The debate is real and hot (two Apollo-adjacent teams, papers weeks apart) — respect it:
+- Braun et al., APD, [2501.14926](https://arxiv.org/abs/2501.14926) — introduces the `100-ReLU/50-neuron` testbed (single config).
+- Newgas, *Universal-AND / dense circuits*, [2507.09816](https://arxiv.org/abs/2507.09816) — **already has a single-axis (sparsity) phase diagram + a hidden-dim sweep** and a 2-way classifier. → we must **never** claim "first phase diagram."
+- Skeptic, [2606.14673](https://arxiv.org/abs/2606.14673) — sparsity sweep, **L2 only**, dense-vs-sparse bifurcation by observation.
+- da Silva & Heimersheim, [2607.04800](https://arxiv.org/abs/2607.04800) — **owns the L2-vs-L4 takeaway** (L2 = naive, exponent > 2 = superposed), at fixed sparsity `p=0.02`.
+- Capacity: Adler & Shavit [2409.15318](https://arxiv.org/abs/2409.15318) (bound, pure theory, zero trained models); Hänni et al. [2408.05451](https://arxiv.org/abs/2408.05451) (construction).
 
-## What "computation in superposition" means (primer)
+**What is genuinely un-done anywhere (arXiv, LessWrong/AF, Apollo, transformer-circuits, MATS/SPAR):**
+(1) the empirical **learned-code-density vs Adler-Shavit-ceiling** overlay; (2) **one consistent
+classifier** applied uniformly across all setups (the L4 paper itself calls its metric "complementary
+rather than identical" to the skeptic's — the fragmentation is real); (3) the **joint (sparsity ×
+loss)** grid the two camps never co-sampled.
 
-Toy setup (the standard "compressed computation" task):
-- `n` input features `x ∈ ℝⁿ`, **sparse**: each `xᵢ` is active with probability `s` (small),
-  value e.g. `Uniform(0,1)`, else 0.
-- **Target = an elementwise nonlinearity**, e.g. `yᵢ = ReLU(xᵢ)` for all `i`. So the task is
-  "compute `n` independent ReLUs."
-- **Model = one hidden layer of `d` neurons** (`d < n`): `h = ReLU(Wᵢₙ x + b)`, `ŷ = W_out h + c`.
-- With `d < n` the network *cannot* dedicate one neuron per feature. If it still computes all `n`
-  ReLUs well, it must be doing it **in superposition** — exploiting that few features are active
-  at once so collisions are rare. That's the phenomenon.
+**We claim exactly:** "first empirical capacity overlay + one reconciling classifier + the joint
+sweep." **We never claim:** "first phase diagram," or "settles/breaks the debate" (say "maps *where*
+the transition sits"). "We ran more configs" and the taxonomy are **not** the contribution.
 
-Three solution types a trained network can land in (the **classifier** we build decides which):
-1. **Dedicated** — each neuron computes ~one feature; only ~`d` features handled. Boring.
-2. **Dense compressed-computation (CC)** — neurons participate in many features, dense weights.
-3. **Superposed code** — features live on a structured, near-orthogonal code (low mutual
-   coherence), decodable by pseudoinverse. This is the "codeword" regime.
+## The task (primer)
 
-The open question = **where in (sparsity `s`, ratio `d/n`, loss) does each regime appear**, and
-how close is the learned code to the proven capacity limit `~Õ(d²)` features.
+Compressed-computation toy model: sparse inputs `x ∈ ℝⁿ` (each `xᵢ` active w.p. `p`, value in
+`[-1,1]`); target `yᵢ = ReLU(xᵢ)`; model = one hidden layer of `m = d < n` ReLU neurons. With `d<n`
+the net can't dedicate a neuron per feature — matching `y` means computing in superposition. The
+`3` regimes the classifier separates: **dedicated** (≈1 feature/neuron, only `d` handled),
+**dense-CC** (many features/neuron, unstructured), **superposed-code** (features on a structured
+low-coherence code, pseudoinverse-decodable — the "codeword" regime).
 
-## v0 — the first two weeks (the go/no-go gate)
+## v0 — the minimum shippable unit
 
-**Week 1 — harness + classifier (all laptop/CPU).**
-- `src/toy_cis.py` — the compressed-computation model, sparse-data generator, training under a
-  configurable loss exponent (**L2** and **L4** — Silva-Heimersheim showed the exponent changes
-  the solution). Reproduce the basic `n=100, d=50, ReLU` compressed-computation result; verify it
-  beats the dedicated-`d`-features baseline.
-- `src/classify.py` — the **solution classifier**: binary neuron-participation matrix, pseudoinverse
-  decoding error, mutual coherence / Welch-bound ratio of the feature code. Output: a label +
-  the diagnostics.
-- ✅ *cite, don't re-derive* the L4 codeword result and the loss-exponent sweep (already done by
-  Silva-Heimersheim) — we build ON it, we don't repeat it.
+**① The classifier as a validated unifier** (`src/classify.py`, done in draft). Reproduce the two
+camps' headline configs and show the *same* classifier recovers *each* paper's verdict — skeptic
+(d=50/m=100, L2, sparsity sweep → dense/sparse bifurcation) and rebuttal (p=0.02, loss sweep → L2
+naive vs >2 superposed). Without this it's a 5th incompatible metric, not a unifier.
 
-**Week 2 — the first phase-diagram slice.**
-- `src/sweep.py` — sweep **sparsity `s ∈ {1,2,4,8}` active features × compression ratio `d/n`**
-  (5 seeds, ~300 tiny runs, minutes on CPU) under L2 and L4; classify every run.
-- **Deliverable = ONE plot**: the 2-D (s × d/n) slice colored by solution type, plus a same-loss
-  comparison of the learned code against a hand-designed binary code. That plot immediately says
-  whether the effect and the phase structure exist.
+**② The capacity-frontier plot** (`src/capacity.py`) — **THE figure.** Define learned-code density /
+effective feature count; sweep size `m` × loss {L2,L4}; plot vs the `O(m²/log m)` ceiling + the Hänni
+construction. *If we ship one figure, it's this.*
 
-**GO / NO-GO (end of week 2):** GO if the sweep shows a *clean, reproducible boundary* between
-solution regimes (the phase structure is real) → expand the diagram + the capacity-bound
-comparison → public write-up. NO-GO if it's mush → pivot to the guaranteed fallback (the
-consistent-classifier adjudication of the debate) and write THAT up. **Either branch ships a
-public artifact.** No third rescue experiment.
+**③ The (sparsity × loss) reconciliation grid** (`src/sweep.py`) — one classifier across the plane
+the camps never co-sampled; show where the L2 boundary moves/dissolves under L4.
 
-## The ~2-month arc (lean — don't inflate this)
+**GO / NO-GO (end of ~2 weeks):** GO if ① validates AND ② shows a clean, interpretable
+learned-vs-bound trajectory → expand + write. NO-GO if the classifier can't reproduce prior verdicts
+(then it isn't a unifier) → the honest fallback is the classifier-validation-and-reconciliation note
+alone. Either ships a public artifact.
 
-- **Wk 1–2:** v0 above → go/no-go.
-- **Wk 3–4:** full phase diagram (add tasks: `abs`, `x²`, small Boolean circuits; add the tied-
-  weights variant); measure learned-code vs. `Õ(d²)` capacity bound. Post a **short public
-  write-up by mid-August** to stake the claim (the area is hot — see Risk).
-- **Wk 5–8 (around státnice):** consolidate into a workshop-length note + clean released code;
-  intermittent, low-compute — survives exam weeks.
+## The dominant risk (not novelty — speed)
 
-## The one real risk
+Two Apollo-adjacent teams ship weeks apart, and the failure mode here is *not finishing*. So: scope
+brutally to laptop scale, **freeze ① + ② as the minimum unit**, and get a short **LessWrong/AF post
+out fast** (it stakes the claim and is the MATS/Apollo-relevant signal) before any workshop paper.
 
-The area is hot and Apollo-adjacent researchers publish in it (the L4 result is weeks old). A
-single slice could get scooped. **Mitigation:** ship the *narrow* v0 (the `s × d/n` slice, NOT the
-loss-exponent sweep others already did) fast, and a public write-up by mid-August; the multi-axis
-diagram + the learned-code-vs-bound comparison are broad enough to survive a partial scoop.
+## References
+See the six links above (verified 2026-07-18) + Newgas 2507.09816.
 
-## How we work (pedagogical, on purpose)
-
-AI writes the code; **I run every experiment and interpret every figure myself**, because a MATS
-interview will probe this project live. Each file has a "what am I looking at" note. First action:
-read `src/toy_cis.py`, run it, and eyeball whether the model beats the dedicated baseline — before
-we sweep anything.
-
-## References (verified 2026-07-18)
-
-- **Toy Models of Superposition** — Elhage et al. 2022, [2209.10652](https://arxiv.org/abs/2209.10652). The phase-change framing.
-- **Attribution-based Parameter Decomposition** — Braun et al. (Apollo) 2025, [2501.14926](https://arxiv.org/abs/2501.14926). Source of the 100-ReLU / 50-neuron *compressed-computation* testbed we reproduce.
-- **Compressed Computation is (probably) not Computation in Superposition** — 2025, [2606.14673](https://arxiv.org/abs/2606.14673). Skeptic side of the debate.
-- **Compressed Computation under L⁴ Loss is likely CiS** — da Silva & Heimersheim 2026, [2607.04800](https://arxiv.org/abs/2607.04800). The L⁴-codeword rebuttal → why the harness exposes L2 vs L4.
-- **On the Complexity of Neural Computation in Superposition** — Adler & Shavit 2024, [2409.15318](https://arxiv.org/abs/2409.15318). The capacity bound (~O(m²/log m)) we benchmark learned codes against. *(The bound is here, not in Hänni.)*
-- **Mathematical Models of Computation in Superposition** — Hänni, Mendel, Vaintrob, Chan 2024, [2408.05451](https://arxiv.org/abs/2408.05451). Constructions where superposition helps computation.
+## How we work (pedagogical)
+AI writes the code; **I run every experiment and interpret every figure**, because MATS probes this
+live. First action: reproduce one prior config and check the classifier recovers that paper's verdict.
