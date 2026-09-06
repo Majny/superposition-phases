@@ -40,7 +40,13 @@ converge to it at scale, is exactly the open question.
 
 ## Status
 
-Paused for my September state exam; active development resumes mid-September 2026.
+**Last updated 6 September 2026.** The study has moved well past what is published in this
+repository: the scaling work below has been superseded by a much larger campaign, and a
+40-page write-up is finished and in review before release. This repository will be updated
+with the paper and the full result set once that review closes. The code here is the early,
+single-seed version and is kept as-is for provenance.
+
+Next runs are sized around my September state exam.
 
 ## Run
 
