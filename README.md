@@ -1,6 +1,6 @@
 # How far below the capacity ceiling do learned superposed codes sit?
 
-**Work in progress** — a toy-model study of *computation in superposition* (CiS): where do
+**Work in progress** (write-up complete, in review before release; see Status) — a toy-model study of *computation in superposition* (CiS): where do
 SGD-learned codes sit relative to the theoretical capacity ceiling
 ([Adler & Shavit, 2409.15318](https://arxiv.org/abs/2409.15318)) and the explicit
 Õ(d^{2/3}) construction ([Hänni et al., 2408.05451](https://arxiv.org/abs/2408.05451)) —
@@ -40,13 +40,13 @@ converge to it at scale, is exactly the open question.
 
 ## Status
 
-**Last updated 6 September 2026.** The study has moved well past what is published in this
+**Last updated 17 September 2026.** The study has moved well past what is published in this
 repository: the scaling work below has been superseded by a much larger campaign, and a
 40-page write-up is finished and in review before release. This repository will be updated
 with the paper and the full result set once that review closes. The code here is the early,
 single-seed version and is kept as-is for provenance.
 
-Next runs are sized around my September state exam.
+The release and the follow-up study it sets up are this autumn's work.
 
 ## Run
 
