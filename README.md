@@ -54,7 +54,7 @@ listed above have not been run here, so none of the results above should be read
 ## Run
 
 ```bash
-uv run --with torch --with numpy src/reproduce.py                     # classifier validation on both debate configs
+uv run --with torch --with numpy src/reproduce.py                     # classifier validation on both debate configs (retrains and overwrites results/checkpoints/)
 uv run --with torch --with numpy --with matplotlib src/scaling.py     # T1/T2/T3 scaling measurements
 uv run --with torch --with numpy src/conv_check.py                    # step-count convergence control
 ```
