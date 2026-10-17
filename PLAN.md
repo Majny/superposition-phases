@@ -27,8 +27,9 @@ The debate is real and hot (two Apollo-adjacent teams, papers weeks apart) — r
 
 **What is genuinely un-done anywhere (arXiv, LessWrong/AF, Apollo, transformer-circuits, MATS/SPAR):**
 (1) the empirical **learned-code-density vs Adler-Shavit-ceiling** overlay; (2) **one consistent
-classifier** applied uniformly across all setups (the L4 paper itself calls its metric "complementary
-rather than identical" to the skeptic's — the fragmentation is real); (3) the **joint (sparsity ×
+classifier** applied uniformly across all setups (the two papers use different diagnostics: the L4
+paper the coefficient of variation of per-feature MSE, the skeptic paper a split of the loss into a
+ReLU term and a mixing term); (3) the **joint (sparsity ×
 loss)** grid the two camps never co-sampled.
 
 **We claim exactly:** "first empirical capacity overlay + one reconciling classifier + the joint
