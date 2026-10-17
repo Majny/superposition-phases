@@ -1,0 +1,72 @@
+[
+  {
+    "tag": "n100_d50_k2.0_l2_s0",
+    "n": 100,
+    "d": 50,
+    "k": 2.0,
+    "loss": "l2",
+    "label": "dense-CC",
+    "coherence": 0.939,
+    "cv_mse": 0.498,
+    "feats_per_neuron": 5.38,
+    "beats_baseline": false,
+    "welch_bound": 0.101,
+    "n_used_log": 97
+  },
+  {
+    "tag": "n100_d50_k2.0_l4_s0",
+    "n": 100,
+    "d": 50,
+    "k": 2.0,
+    "loss": "l4",
+    "label": "superposed-code",
+    "coherence": 0.393,
+    "cv_mse": 0.027,
+    "feats_per_neuron": 12.5,
+    "beats_baseline": true,
+    "welch_bound": 0.101,
+    "n_used_log": 100
+  },
+  {
+    "tag": "n100_d50_k1.0_l2_s0",
+    "n": 100,
+    "d": 50,
+    "k": 1.0,
+    "loss": "l2",
+    "label": "dense-CC",
+    "coherence": 0.818,
+    "cv_mse": 0.41,
+    "feats_per_neuron": 7.24,
+    "beats_baseline": true,
+    "welch_bound": 0.101,
+    "n_used_log": 100
+  },
+  {
+    "tag": "n100_d50_k4.0_l2_s0",
+    "n": 100,
+    "d": 50,
+    "k": 4.0,
+    "loss": "l2",
+    "label": "dense-CC",
+    "coherence": 0.999,
+    "cv_mse": 0.739,
+    "feats_per_neuron": 2.08,
+    "beats_baseline": true,
+    "welch_bound": 0.101,
+    "n_used_log": 85
+  },
+  {
+    "tag": "n100_d50_k8.0_l2_s0",
+    "n": 100,
+    "d": 50,
+    "k": 8.0,
+    "loss": "l2",
+    "label": "dedicated",
+    "coherence": 0.997,
+    "cv_mse": 0.954,
+    "feats_per_neuron": 1.14,
+    "beats_baseline": true,
+    "welch_bound": 0.101,
+    "n_used_log": 62
+  }
+]

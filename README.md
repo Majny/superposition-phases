@@ -13,8 +13,9 @@ Full framing, prior art, and claim discipline: [`PLAN.md`](PLAN.md).
 One rule set ({dedicated / dense-CC / superposed-code}: code coherence + coefficient of variation
 of per-feature MSE + features-per-neuron) applied to both headline settings (n=100, d=50).
 The ratios below are the trained loss divided by the dedicated-neuron baseline's loss under the
-same loss function (`results/checkpoints/*_s0.json`, key `ratio`); the classifier labels are
-printed by `src/reproduce.py` and are not stored in `results/`.
+same loss function (`results/checkpoints/*_s0.json`, key `ratio`). The classifier labels are
+printed by `src/reproduce.py`; the output of `src/classify.py` for the five runs it uses is stored
+in `results/classify_s0.json`.
 
 - **Rebuttal setting** ([da Silva & Heimersheim, 2607.04800](https://arxiv.org/abs/2607.04800)),
   k=2 (p=0.02): under L4 loss the ratio is **0.043** (~23× below the baseline) and the label is
