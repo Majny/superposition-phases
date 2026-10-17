@@ -5,7 +5,6 @@ SGD-learned codes sit relative to the theoretical capacity ceiling
 ([Adler & Shavit, 2409.15318](https://arxiv.org/abs/2409.15318)) and the explicit
 Õ(d^{2/3}) construction ([Hänni et al., 2408.05451](https://arxiv.org/abs/2408.05451)),
 and can one classifier reconcile the two sides of the 2026 compressed-computation debate?
-Full framing, prior art, and claim discipline: [`PLAN.md`](PLAN.md).
 
 ## What exists so far (2 focused days; preliminary, single-seed)
 
