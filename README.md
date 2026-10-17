@@ -1,6 +1,6 @@
 # How far below the capacity ceiling do learned superposed codes sit?
 
-**Work in progress** (write-up complete, in review before release; see Status). A toy-model study of *computation in superposition* (CiS): where do
+**Preliminary, single-seed results** (see Status). A toy-model study of *computation in superposition* (CiS): where do
 SGD-learned codes sit relative to the theoretical capacity ceiling
 ([Adler & Shavit, 2409.15318](https://arxiv.org/abs/2409.15318)) and the explicit
 Õ(d^{2/3}) construction ([Hänni et al., 2408.05451](https://arxiv.org/abs/2408.05451)),
@@ -9,26 +9,33 @@ Full framing, prior art, and claim discipline: [`PLAN.md`](PLAN.md).
 
 ## What exists so far (2 focused days; preliminary, single-seed)
 
-**① A 3-class solution classifier that recovers both camps' verdicts.**
-One rule set ({dedicated / dense-CC / superposed-code}: code coherence + cross-validated MSE +
-features-per-neuron) applied to reproductions of both headline configs:
+**① A 3-class solution classifier whose labels agree with both papers' headline verdicts (single seed).**
+One rule set ({dedicated / dense-CC / superposed-code}: code coherence + coefficient of variation
+of per-feature MSE + features-per-neuron) applied to both headline settings (n=100, d=50).
+The ratios below are the trained loss divided by the dedicated-neuron baseline's loss under the
+same loss function (`results/checkpoints/*_s0.json`, key `ratio`); the classifier labels are
+printed by `src/reproduce.py` and are not stored in `results/`.
 
-- **Rebuttal config** ([da Silva & Heimersheim, 2607.04800](https://arxiv.org/abs/2607.04800)):
-  under L4 loss the trained model beats the dedicated-neuron baseline at MSE ratio **0.043**
-  (~23×): a crisp superposed-code verdict, matching the paper.
-- **Skeptic config** ([2606.14673](https://arxiv.org/abs/2606.14673)): under L2 the ratio is
-  **~1.0** (no superposition advantage), matching that paper's verdict.
+- **Rebuttal setting** ([da Silva & Heimersheim, 2607.04800](https://arxiv.org/abs/2607.04800)),
+  k=2 (p=0.02): under L4 loss the ratio is **0.043** (~23× below the baseline) and the label is
+  superposed-code, consistent with the paper. Under L2 at the same setting the ratio is 1.02.
+- **Skeptic setting** ([Bhagat et al., 2606.14673](https://arxiv.org/abs/2606.14673)): under L2
+  the ratio is **~1.0** (0.98 to 1.02 across k ∈ {1, 2, 4, 8}, i.e. within about 2% of the
+  baseline), and no L2 run is labelled superposed-code. This toy model has no residual connection, so it
+  lacks the mixing term that paper identifies as the source of the original model's advantage;
+  the result is consistent with that paper's verdict, not a reproduction of its full analysis.
 
-The classifier is the intended shared instrument the debate currently lacks
-(the two camps use metrics they themselves call "complementary rather than identical").
+The aim is one instrument applied the same way to both settings; the two papers use different
+diagnostics (the L4 paper the coefficient of variation of per-feature MSE, the skeptic paper a
+split of the loss into a ReLU term and a mixing term).
 
-**② First capacity-scaling measurements** (`results/scaling.json`, `results/scaling.png`):
-per-feature MSE vs width `d`, MSE vs co-active load `s`, and max co-active load `s_max` vs `d`.
-Global log-log fits give exponents ~0.60 (MSE vs d), ~0.85 (MSE vs s), ~0.63 (s_max vs d), but
-the MSE-vs-d curve is visibly curved (local slopes steepen from −0.30 toward −1.0 across the
-sweep), so **no exponent claim is made yet**. Whether learned codes genuinely beat the
-random-code interference law (a possible connection to Hänni's d^{2/3} construction), or
-converge to it at scale, is exactly the open question.
+**② First capacity-scaling measurements** (n=300, L4 loss, single seed; `results/scaling.json`,
+`results/scaling.png`): per-feature MSE vs width `d`, MSE vs co-active load `s`, and max co-active
+load `s_max` vs `d` (at MSE < 0.02). Global log-log fits give slopes of about −0.60 (MSE vs d),
++0.85 (MSE vs s) and +0.63 (s_max vs d), but the MSE-vs-d curve is visibly curved (local slopes
+steepen from −0.30 to about −1.06 across d = 20 to 150), so **no exponent claim is made yet**.
+Whether learned codes genuinely beat the random-code interference law (a possible connection
+to Hänni's d^{2/3} construction), or converge to it at scale, is exactly the open question.
 
 ## Open next steps (kill-or-confirm)
 
@@ -40,16 +47,9 @@ converge to it at scale, is exactly the open question.
 
 ## Status
 
-**Last updated 23 September 2026.** The study has moved well past what is published in this
-repository. One of its results: when a layer has to compute more functions than it has neurons,
-the superposed code grows continuously out of the dedicated-neuron solution, rather than
-appearing in a sudden jump. That result comes from a much larger campaign (a 256-job CPU sweep on
-MetaCentrum plus a laptop), which supersedes the scaling work above. A 40-page write-up is
-finished and in review before release. This repository will be updated with the paper and the
-full result set once that review closes. The code here is the early, single-seed version and is
-kept as-is for provenance.
-
-The release and the follow-up study it sets up are this autumn's work.
+**Last updated October 2026.** This repository contains only the early, preliminary work: the
+code and single-seed results described above, kept as-is for provenance. The open next steps
+listed above have not been run here, so none of the results above should be read as established.
 
 ## Run
 
