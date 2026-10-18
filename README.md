@@ -63,4 +63,4 @@ uv run --with torch --with numpy src/conv_check.py                    # step-cou
 
 **Jakub Dvořák** · [kubadvorak.com](https://kubadvorak.com) · hi@kubadvorak.com
 
-Engineering is AI-assisted (Claude); I run every experiment and interpret every figure.
+Code was written with AI assistance (Claude). I run every experiment and interpret every figure.
